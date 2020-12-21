@@ -67,12 +67,20 @@ class Type extends StatelessWidget {
       default:
         col = Colors.white;
     }
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(35)),
-        color: col.withOpacity(0.8)
-      ),
-      child: Para(text: type.toUpperCase()),
+    return InkWell(
+      onTap: () {
+        Navigator.popAndPushNamed(context, '/search', arguments: type);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(35)),
+          color: col.withOpacity(0.8)
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: Txt(text: type.toUpperCase())
+        ),
+      )
     );
   }
 }

@@ -18,24 +18,26 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Timer(Duration(seconds: 2), () => Navigator.popAndPushNamed(context, '/search'));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      body: BKG(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Heading(text: 'Loading'),
-            InkWell(
-              onTap: () => Navigator.popAndPushNamed(context, '/search'),
-              child: LoadingBall()
-            )
-          ]
+      body: InkWell(
+        onTap: () => Navigator.popAndPushNamed(context, '/search'),
+        child: BKG(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Heading(text: 'Loading'),
+              InkWell(
+                onTap: () => Navigator.popAndPushNamed(context, '/search'),
+                child: LoadingBall()
+              )
+            ]
+          )
         )
       ),
     );

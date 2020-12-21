@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pokeviewer/screens/Details.dart';
 import 'package:pokeviewer/screens/Home.dart';
 import 'package:pokeviewer/screens/Search.dart';
+import 'package:pokeviewer/screens/Tutorial.dart';
 
 void main() {
   runApp(PokeViewer());
@@ -14,7 +15,8 @@ class PokeViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        '/': (context) => HomeScreen(),
+        '/home': (context) => HomeScreen(),
+        '/': (context) => Tutorial(),
         '/search': (context) => SearchScreen(),
         '/details': (context) => DetailsScreen()
       },

@@ -8,7 +8,8 @@ import 'package:pokeviewer/components/loading_box.dart';
 import 'package:pokeviewer/components/pokemon_block.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({Key key}) : super(key: key);
+  String filter;
+  SearchScreen({Key key, this.filter}) : super(key: key);
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -16,16 +17,104 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String pokemon;
+  bool searched;
   String searchError;
   String filter;
   List respVal;
   bool loading_results;
   List<Widget> results;
 
+  Future<void> showFilterDiag() async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Filter'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Container(
+                width: 400,
+                height: 100,
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Filter by Type (i.e. fire)'
+                  ),
+                  style: TextStyle(
+                    color: Color(0xff12355B),
+                    fontFamily: 'Eras ITC',
+                    fontSize: 18,
+                  ),
+                  onChanged: (val) {
+                    var types = ['fire', 'water', 'flying', 'bug', 'dark', 'fairy', 'fighting', 'pyschic', 'ground', 'rock', 'dragon', 'electric', 'grass', 'steel', 'posion', 'flying', 'ghost', 'ice'];
+                    if(types.contains(val.toLowerCase())){
+                      val = val[0].toUpperCase() + val.substring(1);
+                      this.setState(() {
+                        filter = val;
+                      });
+                    }
+                  },
+                  onSubmitted: (val) {
+                    var types = ['fire', 'water', 'flying', 'bug', 'dark', 'fairy', 'fighting', 'pyschic', 'ground', 'rock', 'dragon', 'electric', 'grass', 'steel', 'posion', 'flying', 'ghost', 'ice'];
+                    if(types.contains(val.toLowerCase())){
+                      val = val[0].toUpperCase() + val.substring(1);
+                      this.setState(() {
+                        filter = val;
+                      });
+                    }
+
+                    // search with filter
+                  },
+                )
+            ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Clear'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              this.setState(() {
+                filter = 'Name';
+              });
+            },
+          ),
+          TextButton(
+            child: Text('Approve'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              searchFilter();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  void searchFilter(){
+    this.setState(() {
+      loading_results = true;
+    });
+    var url = 'https://full5end.pythonanywhere.com/search_filter?type='+filter+'&query='+pokemon;
+    print(url);
+    http.get(url).then((response) {
+      setState(() {
+        loading_results = false;
+        Map<String, dynamic> parsed = json.decode(response.body);
+        respVal = parsed['results'];        
+      });
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    searched = false;
     pokemon = '';
     filter = 'Name';
   }
@@ -34,9 +123,9 @@ class _SearchScreenState extends State<SearchScreen> {
     this.setState(() {
       loading_results = true;
     });
-    var url = 'http://192.168.56.1:9000/search?column='+filter+'&query='+pokemon;
+    var url = 'https://full5end.pythonanywhere.com/search?column='+filter+'&query='+pokemon;
     print(url);
-    http.get(url).then((response) {
+    http.get(url, headers: {}).then((response) {
       setState(() {
         loading_results = false;
         Map<String, dynamic> parsed = json.decode(response.body);
@@ -48,6 +137,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final String args = ModalRoute.of(context).settings.arguments;
+
+    try {
+      if(args != null && !searched){
+        this.setState(() {
+          filter = args;
+          searched = true;
+        });
+        searchFilter();
+      }
+    } catch (error) {
+      print(error);
+    }
+
     return Scaffold(
       appBar: null,
       body: BKG(
@@ -96,7 +199,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             this.setState(() {
                               pokemon = val;
                             });
-                            search();
+                            if(filter != 'Name'){
+                              searchFilter();
+                            } else {
+                              search();
+                            }
                           },
                         )
                     ),
@@ -104,7 +211,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       padding: EdgeInsets.only(left: 3,right: 10),
                       child: InkWell(
                         onTap: () {
-                          print("filter");
+                          showFilterDiag();
                         },
                         child: Icon(Icons.filter_list_alt, size: 35, color: Color(0xff68D999)),
                       )
@@ -134,7 +241,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   })
                 )
               )
-            ): Container()
+            ): Padding(
+              padding: EdgeInsets.only(top: 100),
+              child: Image.asset('assets/search.png')
+            )
           ],
         )
       ),

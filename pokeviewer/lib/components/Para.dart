@@ -11,7 +11,7 @@ class Para extends StatelessWidget {
       style: TextStyle(
         color: Colors.white,
         fontFamily: 'Eras ITC',
-        fontSize: 30,
+        fontSize: 14,
       )
     );
   }
